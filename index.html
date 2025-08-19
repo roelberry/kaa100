@@ -1,1 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!--
+  KAA Centennial Scrollytelling – Single-file site
+  ------------------------------------------------
+  📦 How to deploy (GitHub + Vercel)
+  1) Save this file as index.html
+  2) Create a new GitHub repo, commit this file at the root
+  3) Go to vercel.com → New Project → Import the repo → Framework Preset: "Other"
+  4) Build Command: (leave empty) • Output: "/" • Root Directory: "/"
+  5) Deploy. That’s it – it’s a static site!
 
+  🛠 Customize content
+  - Scroll down to the <script id="facts-data"> block to edit the Did-You-Know facts.
+  - Add source URLs if you have them; they’ll render as buttons.
+  - You can reorder or add facts; the UI updates automatically.
+
+  🧩 Libraries used (CDNs)
+  - Tailwind CSS (utility styles)
+  - GSAP + ScrollTrigger + TextPlugin (scrollytelling animations)
+  - Lenis (smooth scrolling)
+  - canvas-confetti (celebration bursts)
+
+  ♿ Accessibility & UX
+  - Respects prefers-reduced-motion: disables heavy animations
+  - High contrast, large touch targets, keyboard focus states
+  - Skip-to-content link, semantic landmarks
+
+  -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kokomo Art Association • 100 Years of Impact</title>
+  <meta name="description" content="Did You Know? A scrollytelling showcase of the Kokomo Art Association’s hidden impact across 100 years." />
+  <meta property="og:title" content="Kokomo Art Association • 100 Years of Impact" />
+  <meta property="og:description" content="Did You Know? A scrollytelling showcase of KAA’s hidden community impact." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0a0a0a" />
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','Inter','sans-serif'],
+            body: ['ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','Inter','sans-serif']
+          },
+          colors: {
+            kaa: {
+              bg: '#0a0a0a',
+              ink: '#e5e7eb',
+              accent: '#f59e0b',
+              glow: '#22d3ee'
+            }
+          },
+          boxShadow: {
+            glow: '0 0 0 2px rgba(34,211,238,0.35), 0 20px 60px -15px rgba(34,211,238,0.35)'
+          },
+          backgroundImage: {
+            grid: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- GSAP + plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/TextPlugin.min.js"></script>
+  <!-- Lenis smooth scroll -->
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.24/dist/lenis.min.js"></script>
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root { color-scheme: dark; }
+    html { scroll-behavior: auto; }
+    html.lenis { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto; }
+    .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+    .lenis.lenis-stopped { overflow: hidden; }
+    .lenis.lenis-smooth iframe { pointer-events: none; }
+
+    /* Subtle grain overlay */
+    .grain:before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.08; background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2272%22 height=%2272%22 viewBox=%220 0 72 72%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.45%22/></svg>'); mix-blend-mode:screen; }
+
+    /* Panel track for horizontal scrollytelling */
+    .panels { display:flex; height:100vh; width: max(100vw, 100%); }
+    .panel { min-width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; position:relative; }
+    .panel .inner { max-width: 78ch; padding: 2rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body class="grain bg-kaa-bg text-kaa-ink font-body selection:bg-kaa-accent/30">
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:bg-white/10 focus:backdrop-blur focus:rounded-full focus:px-4 focus:py-2">Skip to content</a>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 border-b border-white/5 bg-black/40 backdrop-blur">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-xl bg-gradient-to-tr from-kaa-accent to-kaa-glow shadow-glow"></div>
+        <span class="font-display tracking-wide text-sm md:text-base uppercase">Kokomo Art Association • 100 Years</span>
+      </div>
+      <nav class="ml-auto flex items-center gap-2 md:gap-3 text-sm">
+        <a href="#story" class="px-3 py-1.5 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow">Story</a>
+        <a href="#facts" class="px-3 py-1.5 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow">Did You Know?</a>
+        <a href="#memory" class="px-3 py-1.5 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow">Memory Wall</a>
+        <button id="themeToggle" class="px-3 py-1.5 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow" aria-label="Toggle theme">Theme</button>
+      </nav>
+    </div>
+    <div class="relative h-1 bg-white/5" aria-hidden="true">
+      <div id="progress" class="h-1 w-0 bg-gradient-to-r from-kaa-accent to-kaa-glow"></div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="story" class="relative overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 opacity-30" style="background: radial-gradient(600px 300px at 20% -10%, rgba(245,158,11,.35), transparent 60%), radial-gradient(600px 300px at 80% 110%, rgba(34,211,238,.35), transparent 60%)"></div>
+    <div class="mx-auto max-w-7xl px-4 py-24 md:py-36 grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h1 class="text-4xl md:text-6xl font-display leading-[0.95] tracking-tight">
+          <span class="block text-kaa-ink/80">Did You Know?</span>
+          <span id="heroText" class="block mt-2 bg-clip-text text-transparent bg-gradient-to-tr from-kaa-accent via-white to-kaa-glow">100 Years of Hidden Impact</span>
+        </h1>
+        <p class="mt-6 text-lg md:text-xl text-kaa-ink/80 max-w-prose">From hotel lobbies and school libraries to neon-lit alleys and tiny free galleries, the Kokomo Art Association has shaped community life in unexpected ways. Scroll to discover the stories.</p>
+        <div class="mt-8 flex items-center gap-3">
+          <a href="#facts" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow">
+            <span>Start Exploring</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="opacity-80"><path d="M12 5v14M12 19l7-7m-7 7l-7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <button id="confettiBtn" class="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow">Celebrate 100</button>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="aspect-[4/3] w-full rounded-3xl border border-white/10 bg-[length:16px_16px] bg-grid shadow-glow overflow-hidden">
+          <div class="absolute inset-0 opacity-20" style="background: radial-gradient(500px 300px at 30% 10%, rgba(34,211,238,.6), transparent 60%), radial-gradient(600px 500px at 80% 90%, rgba(245,158,11,.6), transparent 60%)"></div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="text-center">
+              <div id="counter" class="text-7xl md:text-8xl font-display tracking-tighter">100</div>
+              <div class="mt-2 text-kaa-ink/70">Years • 1925–2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scrollytelling Track (horizontal panels advanced by vertical scroll) -->
+  <main id="main">
+    <section id="facts" class="relative">
+      <div class="mx-auto max-w-7xl px-4 py-12">
+        <h2 class="text-2xl md:text-3xl font-display mb-6">Scroll Through the Highlights</h2>
+        <p class="text-kaa-ink/80 max-w-prose">This immersive section pins as you scroll and slides through milestones. Keyboard users: use the arrow keys while focused inside the track to move between panels.</p>
+      </div>
+      <div id="trackWrap" class="relative">
+        <div id="panelCount" class="sr-only" aria-live="polite"></div>
+        <div id="panels" class="panels"></div>
+      </div>
+    </section>
+
+    <!-- Card Grid of Facts (quick browsing) -->
+    <section class="relative border-t border-white/5 bg-white/[0.02]">
+      <div class="mx-auto max-w-7xl px-4 py-16">
+        <h3 class="text-2xl md:text-3xl font-display mb-8">Browse the Fun Facts</h3>
+        <div id="cardGrid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
+      </div>
+    </section>
+
+    <!-- Memory Wall -->
+    <section id="memory" class="relative border-t border-white/5">
+      <div class="mx-auto max-w-7xl px-4 py-16">
+        <h3 class="text-2xl md:text-3xl font-display mb-3">Share a Memory</h3>
+        <p class="text-kaa-ink/80 mb-6 max-w-prose">Were you part of a KAA class, exhibition, or alley mural? Leave a note. (Saved locally in your browser.)</p>
+        <form id="memoryForm" class="grid gap-3 md:grid-cols-[1fr_auto]">
+          <label for="memoryInput" class="sr-only">Your memory</label>
+          <textarea id="memoryInput" rows="3" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 placeholder:text-kaa-ink/50 focus:outline-none focus:ring-2 focus:ring-kaa-glow" placeholder="I remember…"></textarea>
+          <button class="h-full rounded-2xl border border-white/10 bg-gradient-to-r from-kaa-accent to-kaa-glow px-5 py-3 font-medium text-black hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-kaa-glow">Post</button>
+        </form>
+        <ul id="memoryList" class="mt-8 grid gap-4 md:grid-cols-2"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5">
+    <div class="mx-auto max-w-7xl px-4 py-10 text-sm text-kaa-ink/70 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+      <p>© Kokomo Art Association Centennial</p>
+      <p><span class="opacity-70">Tip:</span> Press “C” to celebrate. Press “?” for keyboard help.</p>
+    </div>
+  </footer>
+
+  <!-- Facts Data (edit me) -->
+  <script id="facts-data" type="application/json">{
+    "facts": [
+      {
+        "year": "1920s",
+        "title": "Hotel Frances lobby exhibits",
+        "text": "In the 1920s, the Association displayed continuous art exhibits in the lobby of downtown Kokomo’s Hotel Frances—bringing art into daily city life.",
+        "source": "KAA historical notes",
+        "url": "#"
+      },
+      {
+        "year": "Mid-20th c.",
+        "title": "Permanent Collection in everyday spaces",
+        "text": "Works from the Association’s collection appeared in the high school library and even the YMCA, turning familiar places into informal galleries.",
+        "source": "KAA historical notes",
+        "url": "#"
+      },
+      {
+        "year": "1929–present",
+        "title": "Annual Spring Art Show",
+        "text": "A near-century tradition: the juried Spring Art Show has launched and celebrated generations of artists.",
+        "source": "KAA event archives",
+        "url": "#"
+      },
+      {
+        "year": "1987",
+        "title": "Highland Park home → Kokomo Art Center",
+        "text": "The city provided a historic building in Highland Park, becoming the Kokomo Art Center—a hub for classes, exhibitions, and the collection.",
+        "source": "Kokomo Parks & KAA history",
+        "url": "#"
+      },
+      {
+        "year": "Late 1980s–present",
+        "title": "Summer art camps",
+        "text": "Kids’ art camps offered accessible, hands-on creativity to countless local families—seeding future artists and art lovers.",
+        "source": "KAA program history",
+        "url": "#"
+      },
+      {
+        "year": "1994",
+        "title": "Artworks Gallery at the mall",
+        "text": "KAA launched a co‑op retail gallery inside Kokomo Mall so artists could reach new audiences where they already shopped.",
+        "source": "KAA archives",
+        "url": "#"
+      },
+      {
+        "year": "2013–present",
+        "title": "Artist Alley transformation",
+        "text": "A once‑dreary passage became a glowing, always‑open outdoor gallery—sparking a wave of artful alleys downtown.",
+        "source": "Local news + KAA",
+        "url": "#"
+      },
+      {
+        "year": "2024",
+        "title": "Tuskegee Airmen traveling exhibit",
+        "text": "Artworks Gallery hosted ‘America’s Freedom Flyers,’ honoring five Airmen from Kokomo and inspiring a downtown mural tribute.",
+        "source": "Exhibit & mural coverage",
+        "url": "#"
+      },
+      {
+        "year": "2023",
+        "title": "Little Free Art Gallery",
+        "text": "A miniature gallery outside the Art Center offers tiny artworks and supplies 24/7—anyone can take, trade, or add.",
+        "source": "Community feature",
+        "url": "#"
+      },
+      {
+        "year": "1930s",
+        "title": "Geraldine Armstrong Scott’s statewide leadership",
+        "text": "A Kokomo artist and KAA member exhibited at Hoosier Salon and served in statewide roles—linking local talent to regional impact.",
+        "source": "Artist biographies",
+        "url": "#"
+      }
+    ]
+  }</script>
+
+  <!-- App script -->
+  <script>
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Theme toggle (light/dark)
+    const themeBtn = document.getElementById('themeToggle');
+    function setTheme(mode){ document.documentElement.classList.toggle('invert', mode === 'light'); }
+    themeBtn?.addEventListener('click',()=>{
+      const nowLight = !document.documentElement.classList.contains('invert');
+      setTheme(nowLight ? 'light' : 'dark');
+    });
+
+    // Smooth scroll via Lenis
+    let lenis;
+    if(!prefersReduced && window.Lenis){
+      lenis = new Lenis({ lerp: 0.08, smoothWheel: true, wheelMultiplier: 0.9 });
+      function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+      requestAnimationFrame(raf);
+    }
+
+    // Progress bar
+    const progress = document.getElementById('progress');
+    function updateProgress(){
+      const h = document.documentElement; const b = document.body;
+      const st = 'scrollTop' in h ? h.scrollTop : b.scrollTop;
+      const sh = h.scrollHeight - h.clientHeight;
+      const pct = Math.max(0, Math.min(1, sh ? st / sh : 0));
+      progress.style.width = (pct * 100).toFixed(2) + '%';
+    }
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+
+    // Hero text typing
+    if(!prefersReduced && window.gsap){
+      gsap.registerPlugin(TextPlugin);
+      gsap.to('#heroText', { duration: 2.6, text: '100 Years of Hidden Impact', ease: 'power2.out', delay: 0.3 });
+      gsap.from('#counter', { duration: 1.2, scale: 0.8, opacity: 0, ease: 'back.out(1.7)', delay: 0.2 });
+    }
+
+    // Confetti controls
+    const confettiBtn = document.getElementById('confettiBtn');
+    function fireConfetti(){
+      const count = 220, defaults = { spread: 360, startVelocity: 45, gravity: 0.8, ticks: 200, origin: { y: 0.1 } };
+      confetti({ ...defaults, particleCount: Math.floor(count/3) });
+      confetti({ ...defaults, particleCount: Math.floor(count/3), scalar: 0.8 });
+      confetti({ ...defaults, particleCount: Math.floor(count/3), scalar: 1.2 });
+    }
+    confettiBtn?.addEventListener('click', fireConfetti);
+    document.addEventListener('keydown', (e)=>{
+      if(e.key.toLowerCase() === 'c') fireConfetti();
+      if(e.key === '?') alert('Keyboard tips:\n• Arrow keys: move panels when focus is inside scrollytelling track\n• C: celebrate with confetti\n• Tab: navigate interactive elements');
+    });
+
+    // Load facts data
+    const dataEl = document.getElementById('facts-data');
+    const { facts } = JSON.parse(dataEl.textContent);
+
+    // Build panels (scrollytelling)
+    const panelsEl = document.getElementById('panels');
+    const panelCountLive = document.getElementById('panelCount');
+    facts.forEach((f, i)=>{
+      const panel = document.createElement('article');
+      panel.className = `panel`;
+      panel.setAttribute('tabindex','0');
+      panel.innerHTML = `
+        <div class="absolute inset-0 -z-10 opacity-30" style="background: radial-gradient(600px 300px at ${20 + (i*7)%80}% ${i%2? '90%':'10%'}, rgba(245,158,11,.28), transparent 60%), radial-gradient(600px 300px at ${80 - (i*5)%80}% ${i%2? '10%':'90%'}, rgba(34,211,238,.28), transparent 60%)"></div>
+        <div class="inner text-center">
+          <div class="text-kaa-ink/60 text-sm tracking-widest uppercase">${f.year || ''}</div>
+          <h3 class="mt-2 text-3xl md:text-5xl font-display leading-tight">${f.title}</h3>
+          <p class="mt-4 text-lg md:text-xl text-kaa-ink/85">${f.text}</p>
+          ${f.url && f.url !== '#' ? `<a class="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow" target="_blank" rel="noopener" href="${f.url}">Source</a>` : `<span class="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-kaa-ink/60">Source pending</span>`}
+        </div>`;
+      panelsEl.appendChild(panel);
+    });
+    panelCountLive.textContent = `${facts.length} panels loaded`;
+
+    // Horizontal scrollytelling driven by vertical scroll
+    if(!prefersReduced && window.gsap){
+      gsap.registerPlugin(ScrollTrigger);
+      const totalPanels = facts.length;
+      const scrollTween = gsap.to('.panels', {
+        xPercent: -100 * (totalPanels - 1),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#trackWrap',
+          pin: true,
+          scrub: 0.35,
+          start: 'top top',
+          end: () => `+=${window.innerWidth * (totalPanels - 1)}`,
+          invalidateOnRefresh: true,
+        }
+      });
+
+      // Animate each panel content in
+      gsap.utils.toArray('.panel .inner').forEach((inner, idx)=>{
+        gsap.from(inner, {
+          opacity: 0,
+          y: 40,
+          duration: 0.6,
+          ease: 'power2.out',
+          scrollTrigger: {
+            containerAnimation: scrollTween,
+            trigger: inner,
+            start: 'left center',
+            toggleActions: 'play none none reverse'
+          }
+        });
+      });
+    }
+
+    // Card grid
+    const gridEl = document.getElementById('cardGrid');
+    facts.forEach((f, i)=>{
+      const card = document.createElement('article');
+      card.className = 'rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:bg-white/[0.06] focus-within:bg-white/[0.06] transition';
+      card.innerHTML = `
+        <div class="text-xs uppercase tracking-wider text-kaa-ink/60">${f.year || ''}</div>
+        <h4 class="mt-1 text-xl font-display">${f.title}</h4>
+        <p class="mt-2 text-kaa-ink/80">${f.text}</p>
+        <div class="mt-4 flex items-center gap-2">
+          ${f.url && f.url !== '#' ? `<a target="_blank" rel="noopener" href="${f.url}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow">Source</a>` : `<span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-kaa-ink/60">Source pending</span>`}
+          <button class="ml-auto inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-sm hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow" data-jump="${i}">View in Story</button>
+        </div>`;
+      gridEl.appendChild(card);
+    });
+
+    // Jump to specific panel when clicking from card
+    gridEl.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-jump]');
+      if(!btn) return;
+      const index = parseInt(btn.getAttribute('data-jump'), 10);
+      const targetX = window.innerWidth * index;
+      const trackTop = document.getElementById('trackWrap').getBoundingClientRect().top + window.scrollY;
+      // Scroll to the start of the track, then nudge horizontal via ScrollToPlugin-like effect
+      window.scrollTo({ top: trackTop + 1, behavior: 'smooth' });
+      // Brief highlight
+      const panel = document.querySelectorAll('.panel')[index];
+      if(panel){
+        panel.animate([{ filter: 'brightness(1.4)' }, { filter: 'brightness(1)' }], { duration: 900, easing: 'ease' });
+      }
+    });
+
+    // Memory wall (localStorage)
+    const memKey = 'kaa-centennial-memories-v1';
+    const form = document.getElementById('memoryForm');
+    const input = document.getElementById('memoryInput');
+    const list = document.getElementById('memoryList');
+
+    function renderMemories(){
+      const items = JSON.parse(localStorage.getItem(memKey) || '[]');
+      list.innerHTML = '';
+      items.forEach((t, i)=>{
+        const li = document.createElement('li');
+        li.className = 'rounded-2xl border border-white/10 bg-white/[0.03] p-4';
+        li.innerHTML = `<p class="whitespace-pre-wrap">${t}</p>`;
+        list.appendChild(li);
+      });
+    }
+    renderMemories();
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const v = (input.value || '').trim();
+      if(!v) return;
+      const items = JSON.parse(localStorage.getItem(memKey) || '[]');
+      items.unshift(v);
+      localStorage.setItem(memKey, JSON.stringify(items.slice(0, 50)));
+      input.value = '';
+      renderMemories();
+      fireConfetti();
+    });
+
+  </script>
+</body>
+</html>
