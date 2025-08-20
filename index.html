@@ -2,36 +2,14 @@
 <html lang="en">
 <head>
   <!--
-  KAA Centennial Scrollytelling – Single-file site
-  ------------------------------------------------
-  📦 How to deploy (GitHub + Vercel)
-  1) Save this file as index.html
-  2) Create a new GitHub repo, commit this file at the root
-  3) Go to vercel.com → New Project → Import the repo → Framework Preset: "Other"
-  4) Build Command: (leave empty) • Output: "/" • Root Directory: "/"
-  5) Deploy. That’s it – it’s a static site!
-
-  🛠 Customize content
-  - Scroll down to the <script id="facts-data"> block to edit the Did-You-Know facts.
-  - Add source URLs if you have them; they’ll render as buttons.
-  - You can reorder or add facts; the UI updates automatically.
-
-  🧩 Libraries used (CDNs)
-  - Tailwind CSS (utility styles)
-  - GSAP + ScrollTrigger + TextPlugin (scrollytelling animations)
-  - Lenis (smooth scrolling)
-  - canvas-confetti (celebration bursts)
-
-  ♿ Accessibility & UX
-  - Respects prefers-reduced-motion: disables heavy animations
-  - High contrast, large touch targets, keyboard focus states
-  - Skip-to-content link, semantic landmarks
-
+  KAA Centennial Scrollytelling — single-file deploy
+  GitHub → Vercel: New Project → Framework: “Other” → Build: (empty) → Output: "/"
   -->
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kokomo Art Association • 100 Years of Impact</title>
-  <meta name="description" content="Did You Know? A scrollytelling showcase of the Kokomo Art Association’s hidden impact across 100 years." />
+  <meta name="description" content="Did You Know? A scrollytelling showcase of the Kokomo Art Association’s hidden impact across 100 years—now with sources." />
   <meta property="og:title" content="Kokomo Art Association • 100 Years of Impact" />
   <meta property="og:description" content="Did You Know? A scrollytelling showcase of KAA’s hidden community impact." />
   <meta property="og:type" content="website" />
@@ -48,12 +26,7 @@
             body: ['ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','Inter','sans-serif']
           },
           colors: {
-            kaa: {
-              bg: '#0a0a0a',
-              ink: '#e5e7eb',
-              accent: '#f59e0b',
-              glow: '#22d3ee'
-            }
+            kaa: { bg:'#0a0a0a', ink:'#e5e7eb', accent:'#f59e0b', glow:'#22d3ee' }
           },
           boxShadow: {
             glow: '0 0 0 2px rgba(34,211,238,0.35), 0 20px 60px -15px rgba(34,211,238,0.35)'
@@ -79,21 +52,24 @@
     :root { color-scheme: dark; }
     html { scroll-behavior: auto; }
     html.lenis { height: auto; }
-    .lenis.lenis-smooth { scroll-behavior: auto; }
     .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
     .lenis.lenis-stopped { overflow: hidden; }
     .lenis.lenis-smooth iframe { pointer-events: none; }
 
     /* Subtle grain overlay */
-    .grain:before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.08; background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2272%22 height=%2272%22 viewBox=%220 0 72 72%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.45%22/></svg>'); mix-blend-mode:screen; }
+    .grain:before {
+      content:""; position:fixed; inset:0; pointer-events:none; opacity:.08;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2272%22 height=%2272%22 viewBox=%220 0 72 72%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.45%22/></svg>');
+      mix-blend-mode:screen;
+    }
 
-    /* Panel track for horizontal scrollytelling */
-    .panels { display:flex; height:100vh; width: max(100vw, 100%); }
+    /* Horizontal panels */
+    .panels { display:flex; height:100vh; width:max(100vw,100%); }
     .panel { min-width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; position:relative; }
-    .panel .inner { max-width: 78ch; padding: 2rem; }
+    .panel .inner { max-width:78ch; padding:2rem; }
 
     @media (prefers-reduced-motion: reduce) {
-      * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+      * { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
     }
   </style>
 </head>
@@ -128,7 +104,9 @@
           <span class="block text-kaa-ink/80">Did You Know?</span>
           <span id="heroText" class="block mt-2 bg-clip-text text-transparent bg-gradient-to-tr from-kaa-accent via-white to-kaa-glow">100 Years of Hidden Impact</span>
         </h1>
-        <p class="mt-6 text-lg md:text-xl text-kaa-ink/80 max-w-prose">From hotel lobbies and school libraries to neon-lit alleys and tiny free galleries, the Kokomo Art Association has shaped community life in unexpected ways. Scroll to discover the stories.</p>
+        <p class="mt-6 text-lg md:text-xl text-kaa-ink/80 max-w-prose">
+          From hotel lobbies and school libraries to neon-lit alleys and a tiny free gallery, the KAA has shaped Kokomo’s life in unexpected ways. Scroll to discover the stories, then add your own memory.
+        </p>
         <div class="mt-8 flex items-center gap-3">
           <a href="#facts" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow">
             <span>Start Exploring</span>
@@ -143,20 +121,35 @@
           <div class="absolute inset-0 flex items-center justify-center">
             <div class="text-center">
               <div id="counter" class="text-7xl md:text-8xl font-display tracking-tighter">100</div>
-              <div class="mt-2 text-kaa-ink/70">Years • 1925–2025</div>
+              <div class="mt-2 text-kaa-ink/70">Years • 1926–2025</div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Narrative block (toggle) -->
+    <div class="mx-auto max-w-5xl px-4 pb-12">
+      <details class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 group">
+        <summary class="cursor-pointer list-none flex items-center justify-between">
+          <h2 class="text-xl md:text-2xl font-display">A Century of Color: How the Kokomo Art Association Shaped a City’s Soul</h2>
+          <span class="ml-4 rounded-full px-3 py-1 text-sm bg-white/10">Read</span>
+        </summary>
+        <div class="mt-4 space-y-4 text-kaa-ink/85 leading-relaxed">
+          <p>As KAA celebrates its centennial, it marks not just time but a century of community-powered creativity. True to its mission “to bring art to the community, and the community to art,” the Association began without a building—meeting in homes, a hotel lobby, even a gym—proving a gallery is a commitment, not a room.</p>
+          <p>Over decades, KAA embedded art in everyday places: a high school library, the YMCA, public libraries and parks. Later, two permanent homes took shape—the Art Center in Highland Park and Artworks Gallery downtown—anchoring classes, camps, juried exhibits, and artist entrepreneurship.</p>
+          <p>In 2014, the spark leapt outdoors: Artist Alley turned a dark passage into a 24/7 gallery and inspired a broader movement, <em>All Alleys Lead to Art</em>. Alongside traditions like the Annual Spring Art Show and the Strawberry Festival Plein Air Paint Out, these efforts knit culture into downtown life and drew new audiences to Kokomo.</p>
+        </div>
+      </details>
+    </div>
   </section>
 
-  <!-- Scrollytelling Track (horizontal panels advanced by vertical scroll) -->
+  <!-- Scrollytelling Track -->
   <main id="main">
     <section id="facts" class="relative">
       <div class="mx-auto max-w-7xl px-4 py-12">
         <h2 class="text-2xl md:text-3xl font-display mb-6">Scroll Through the Highlights</h2>
-        <p class="text-kaa-ink/80 max-w-prose">This immersive section pins as you scroll and slides through milestones. Keyboard users: use the arrow keys while focused inside the track to move between panels.</p>
+        <p class="text-kaa-ink/80 max-w-prose">This pinned section translates vertical scroll into a horizontal journey. Sources are linked on every panel.</p>
       </div>
       <div id="trackWrap" class="relative">
         <div id="panelCount" class="sr-only" aria-live="polite"></div>
@@ -164,7 +157,7 @@
       </div>
     </section>
 
-    <!-- Card Grid of Facts (quick browsing) -->
+    <!-- Card Grid of Facts -->
     <section class="relative border-t border-white/5 bg-white/[0.02]">
       <div class="mx-auto max-w-7xl px-4 py-16">
         <h3 class="text-2xl md:text-3xl font-display mb-8">Browse the Fun Facts</h3>
@@ -199,74 +192,100 @@
   <script id="facts-data" type="application/json">{
     "facts": [
       {
-        "year": "1920s",
-        "title": "Hotel Frances lobby exhibits",
-        "text": "In the 1920s, the Association displayed continuous art exhibits in the lobby of downtown Kokomo’s Hotel Frances—bringing art into daily city life.",
-        "source": "KAA historical notes",
-        "url": "#"
+        "year": "1926–1940s",
+        "title": "The first ‘galleries’ were a hotel lobby, YMCA & a city park",
+        "text": "Organized in 1926 to interest the community in the Arts, KAA met in members’ homes and showed continuous exhibits in the Hotel Frances lobby—later at the YMCA and in a city park.",
+        "sources": [
+          {"label":"KAA • About / History","url":"https://www.kaaonline.org/about"}
+        ]
       },
       {
-        "year": "Mid-20th c.",
-        "title": "Permanent Collection in everyday spaces",
-        "text": "Works from the Association’s collection appeared in the high school library and even the YMCA, turning familiar places into informal galleries.",
-        "source": "KAA historical notes",
-        "url": "#"
+        "year": "Early history",
+        "title": "A Permanent Collection for everyday places",
+        "text": "KAA’s Permanent Collection of Hoosier Art was displayed in the Kokomo High School library and the YMCA; local artists also exhibited at the Elliot Carriage House and the Public Library.",
+        "sources": [
+          {"label":"KAA • About / History","url":"https://www.kaaonline.org/about"}
+        ]
       },
       {
-        "year": "1929–present",
-        "title": "Annual Spring Art Show",
-        "text": "A near-century tradition: the juried Spring Art Show has launched and celebrated generations of artists.",
-        "source": "KAA event archives",
-        "url": "#"
+        "year": "1962 & 1981",
+        "title": "Bylaws adopted; 501(c)(3) status",
+        "text": "KAA established bylaws and a constitution in 1962; not-for-profit status was attained in 1981—fueling grants and fundraising.",
+        "sources": [
+          {"label":"KAA • About / History","url":"https://www.kaaonline.org/about"}
+        ]
       },
       {
-        "year": "1987",
-        "title": "Highland Park home → Kokomo Art Center",
-        "text": "The city provided a historic building in Highland Park, becoming the Kokomo Art Center—a hub for classes, exhibitions, and the collection.",
-        "source": "Kokomo Parks & KAA history",
-        "url": "#"
+        "year": "1987–present",
+        "title": "A home in Highland Park: Kokomo Art Center",
+        "text": "The city provided a building at 525 W. Ricketts St. to house the collection, host classes, exhibitions, competitions, and children’s summer Art Camps. Admission is free.",
+        "sources": [
+          {"label":"KAA • About / History","url":"https://www.kaaonline.org/about"},
+          {"label":"KAA • Kokomo Art Center","url":"https://www.kaaonline.org/kokomo-art-center"}
+        ]
       },
       {
-        "year": "Late 1980s–present",
-        "title": "Summer art camps",
-        "text": "Kids’ art camps offered accessible, hands-on creativity to countless local families—seeding future artists and art lovers.",
-        "source": "KAA program history",
-        "url": "#"
+        "year": "1994 → 2011 → 2012",
+        "title": "From mall co-op to downtown anchor",
+        "text": "KAA launched a co-op gallery in Kokomo Mall (1994), then moved downtown to 210 N. Main (2011). In 2012, a gift from John “Jack” C. Kuhns enabled the purchase of the building—securing a permanent downtown presence.",
+        "sources": [
+          {"label":"KAA • About / History","url":"https://www.kaaonline.org/about"}
+        ]
       },
       {
-        "year": "1994",
-        "title": "Artworks Gallery at the mall",
-        "text": "KAA launched a co‑op retail gallery inside Kokomo Mall so artists could reach new audiences where they already shopped.",
-        "source": "KAA archives",
-        "url": "#"
+        "year": "2014–present",
+        "title": "Artist Alley: a 24/7 outdoor gallery",
+        "text": "A once-dark passage beside Artworks Gallery became a lighted, always-open public gallery of murals and sculpture—connecting to Kokomo’s industrial heritage and boosting downtown foot traffic.",
+        "sources": [
+          {"label":"This Is Kokomo • Artist Alley","url":"https://thisiskokomo.com/artist-alley/"},
+          {"label":"Greater Kokomo • Artist Alley","url":"https://greaterkokomo.com/artist-alley/"}
+        ]
       },
       {
-        "year": "2013–present",
-        "title": "Artist Alley transformation",
-        "text": "A once‑dreary passage became a glowing, always‑open outdoor gallery—sparking a wave of artful alleys downtown.",
-        "source": "Local news + KAA",
-        "url": "#"
+        "year": "2018–present",
+        "title": "All Alleys Lead to Art",
+        "text": "Artist Alley helped spark the broader alley activation initiative—expanding public art into themed alleyways like Courthouse Alley and Garden Alley.",
+        "sources": [
+          {"label":"Greater Kokomo • All Alleys Lead to Art","url":"https://greaterkokomo.com/all-alleys-lead-to-art/"},
+          {"label":"Visit Kokomo • Downtown Art","url":"https://visitkokomo.org/downtown-art/"}
+        ]
       },
       {
-        "year": "2024",
-        "title": "Tuskegee Airmen traveling exhibit",
-        "text": "Artworks Gallery hosted ‘America’s Freedom Flyers,’ honoring five Airmen from Kokomo and inspiring a downtown mural tribute.",
-        "source": "Exhibit & mural coverage",
-        "url": "#"
+        "year": "2025",
+        "title": "97th Annual Spring Art Show",
+        "text": "Nearly a century-old tradition continued at the Kokomo Art Center in May–June 2025.",
+        "sources": [
+          {"label":"Visit Kokomo • Event","url":"https://visitkokomo.org/events/annual-spring-art-show/"},
+          {"label":"Kokomo Lantern","url":"https://kokomolantern.substack.com/p/whats-happening-this-week-e9a"}
+        ]
       },
       {
-        "year": "2023",
-        "title": "Little Free Art Gallery",
-        "text": "A miniature gallery outside the Art Center offers tiny artworks and supplies 24/7—anyone can take, trade, or add.",
-        "source": "Community feature",
-        "url": "#"
+        "year": "2025",
+        "title": "Tuskegee Airmen: America’s Freedom Flyers",
+        "text": "Artworks Gallery hosted the traveling exhibit with free admission for students; local ties were highlighted alongside a new mural downtown.",
+        "sources": [
+          {"label":"Kokomo High School News (Feb 26, 2025)","url":"https://wes.kokomoschools.com/o/khs/article/2278376"}
+        ]
       },
       {
-        "year": "1930s",
-        "title": "Geraldine Armstrong Scott’s statewide leadership",
-        "text": "A Kokomo artist and KAA member exhibited at Hoosier Salon and served in statewide roles—linking local talent to regional impact.",
-        "source": "Artist biographies",
-        "url": "#"
+        "year": "2022–present",
+        "title": "Kokomo’s Smallest Art Gallery",
+        "text": "The Little Free Art Gallery (aka Little Free Art Library) outside the Art Center invites anyone to take/leave mini artworks and supplies—open 24/7.",
+        "sources": [
+          {"label":"KAA • Art Center page","url":"https://www.kaaonline.org/kokomo-art-center"},
+          {"label":"The Kokomo Post (Dec 1, 2022)","url":"https://www.thekokomopost.com/articles/how-kokomos-smallest-art-gallery-is-making-a-huge-impact-nbsp"},
+          {"label":"KAA Facebook Post (Nov 29, 2022)","url":"https://www.facebook.com/kokomoartcenter/posts/602410851688561/"}
+        ]
+      },
+      {
+        "year": "Every June",
+        "title": "Strawberry Festival Plein Air Paint Out",
+        "text": "KAA hosts an open plein air day during the festival; works then exhibit at the Kokomo Art Center later in June.",
+        "sources": [
+          {"label":"Greater Kokomo • Plein Air Paint Out","url":"https://greaterkokomo.com/plein-air-paintout/"},
+          {"label":"Visit Kokomo • Plein Air Exhibition","url":"https://visitkokomo.org/events/kokomo-plein-air-exhibition/"},
+          {"label":"IPAPA Schedule (2025)","url":"https://www.inpainters.org/schedule"}
+        ]
       }
     ]
   }</script>
@@ -275,7 +294,7 @@
   <script>
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Theme toggle (light/dark)
+    // Theme toggle (light/dark via invert)
     const themeBtn = document.getElementById('themeToggle');
     function setTheme(mode){ document.documentElement.classList.toggle('invert', mode === 'light'); }
     themeBtn?.addEventListener('click',()=>{
@@ -283,10 +302,10 @@
       setTheme(nowLight ? 'light' : 'dark');
     });
 
-    // Smooth scroll via Lenis
+    // Lenis smooth scroll
     let lenis;
     if(!prefersReduced && window.Lenis){
-      lenis = new Lenis({ lerp: 0.08, smoothWheel: true, wheelMultiplier: 0.9 });
+      lenis = new Lenis({ lerp:0.08, smoothWheel:true, wheelMultiplier:0.9 });
       function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
       requestAnimationFrame(raf);
     }
@@ -297,31 +316,30 @@
       const h = document.documentElement; const b = document.body;
       const st = 'scrollTop' in h ? h.scrollTop : b.scrollTop;
       const sh = h.scrollHeight - h.clientHeight;
-      const pct = Math.max(0, Math.min(1, sh ? st / sh : 0));
-      progress.style.width = (pct * 100).toFixed(2) + '%';
+      const pct = Math.max(0, Math.min(1, sh ? st/sh : 0));
+      progress.style.width = (pct*100).toFixed(2)+'%';
     }
-    document.addEventListener('scroll', updateProgress, { passive: true });
-    updateProgress();
+    document.addEventListener('scroll', updateProgress, { passive:true }); updateProgress();
 
-    // Hero text typing
+    // Hero text typing & counter pop
     if(!prefersReduced && window.gsap){
       gsap.registerPlugin(TextPlugin);
-      gsap.to('#heroText', { duration: 2.6, text: '100 Years of Hidden Impact', ease: 'power2.out', delay: 0.3 });
-      gsap.from('#counter', { duration: 1.2, scale: 0.8, opacity: 0, ease: 'back.out(1.7)', delay: 0.2 });
+      gsap.to('#heroText', { duration:2.4, text:'100 Years of Hidden Impact', ease:'power2.out', delay:0.3 });
+      gsap.from('#counter', { duration:1.2, scale:0.8, opacity:0, ease:'back.out(1.7)', delay:0.2 });
     }
 
     // Confetti controls
     const confettiBtn = document.getElementById('confettiBtn');
     function fireConfetti(){
-      const count = 220, defaults = { spread: 360, startVelocity: 45, gravity: 0.8, ticks: 200, origin: { y: 0.1 } };
+      const count = 220, defaults = { spread:360, startVelocity:45, gravity:0.8, ticks:200, origin:{y:0.1} };
       confetti({ ...defaults, particleCount: Math.floor(count/3) });
-      confetti({ ...defaults, particleCount: Math.floor(count/3), scalar: 0.8 });
-      confetti({ ...defaults, particleCount: Math.floor(count/3), scalar: 1.2 });
+      confetti({ ...defaults, particleCount: Math.floor(count/3), scalar:0.8 });
+      confetti({ ...defaults, particleCount: Math.floor(count/3), scalar:1.2 });
     }
     confettiBtn?.addEventListener('click', fireConfetti);
     document.addEventListener('keydown', (e)=>{
-      if(e.key.toLowerCase() === 'c') fireConfetti();
-      if(e.key === '?') alert('Keyboard tips:\n• Arrow keys: move panels when focus is inside scrollytelling track\n• C: celebrate with confetti\n• Tab: navigate interactive elements');
+      if(e.key.toLowerCase()==='c') fireConfetti();
+      if(e.key==='?') alert('Keyboard tips:\n• Arrow keys: move panels when focus is inside scrollytelling track\n• C: celebrate with confetti\n• Tab: navigate interactive elements');
     });
 
     // Load facts data
@@ -331,9 +349,17 @@
     // Build panels (scrollytelling)
     const panelsEl = document.getElementById('panels');
     const panelCountLive = document.getElementById('panelCount');
+
+    function sourceButtonsHTML(sources) {
+      if(!sources || !sources.length) {
+        return `<span class="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-kaa-ink/60">Source pending</span>`;
+      }
+      return sources.map(s => `<a class="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow" target="_blank" rel="noopener" href="${s.url}">${s.label}</a>`).join(' ');
+    }
+
     facts.forEach((f, i)=>{
       const panel = document.createElement('article');
-      panel.className = `panel`;
+      panel.className = 'panel';
       panel.setAttribute('tabindex','0');
       panel.innerHTML = `
         <div class="absolute inset-0 -z-10 opacity-30" style="background: radial-gradient(600px 300px at ${20 + (i*7)%80}% ${i%2? '90%':'10%'}, rgba(245,158,11,.28), transparent 60%), radial-gradient(600px 300px at ${80 - (i*5)%80}% ${i%2? '10%':'90%'}, rgba(34,211,238,.28), transparent 60%)"></div>
@@ -341,7 +367,7 @@
           <div class="text-kaa-ink/60 text-sm tracking-widest uppercase">${f.year || ''}</div>
           <h3 class="mt-2 text-3xl md:text-5xl font-display leading-tight">${f.title}</h3>
           <p class="mt-4 text-lg md:text-xl text-kaa-ink/85">${f.text}</p>
-          ${f.url && f.url !== '#' ? `<a class="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow" target="_blank" rel="noopener" href="${f.url}">Source</a>` : `<span class="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-kaa-ink/60">Source pending</span>`}
+          <div class="mt-6 flex items-center justify-center gap-2 flex-wrap">${sourceButtonsHTML(f.sources)}</div>
         </div>`;
       panelsEl.appendChild(panel);
     });
@@ -360,23 +386,15 @@
           scrub: 0.35,
           start: 'top top',
           end: () => `+=${window.innerWidth * (totalPanels - 1)}`,
-          invalidateOnRefresh: true,
+          invalidateOnRefresh: true
         }
       });
 
-      // Animate each panel content in
-      gsap.utils.toArray('.panel .inner').forEach((inner, idx)=>{
+      // Animate each panel content
+      gsap.utils.toArray('.panel .inner').forEach((inner)=>{
         gsap.from(inner, {
-          opacity: 0,
-          y: 40,
-          duration: 0.6,
-          ease: 'power2.out',
-          scrollTrigger: {
-            containerAnimation: scrollTween,
-            trigger: inner,
-            start: 'left center',
-            toggleActions: 'play none none reverse'
-          }
+          opacity: 0, y: 40, duration: 0.6, ease: 'power2.out',
+          scrollTrigger: { containerAnimation: scrollTween, trigger: inner, start: 'left center', toggleActions: 'play none none reverse' }
         });
       });
     }
@@ -386,12 +404,13 @@
     facts.forEach((f, i)=>{
       const card = document.createElement('article');
       card.className = 'rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:bg-white/[0.06] focus-within:bg-white/[0.06] transition';
+      const srcBtns = (f.sources||[]).slice(0,2).map(s=>`<a target="_blank" rel="noopener" href="${s.url}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow">${s.label}</a>`).join(' ');
       card.innerHTML = `
         <div class="text-xs uppercase tracking-wider text-kaa-ink/60">${f.year || ''}</div>
         <h4 class="mt-1 text-xl font-display">${f.title}</h4>
         <p class="mt-2 text-kaa-ink/80">${f.text}</p>
-        <div class="mt-4 flex items-center gap-2">
-          ${f.url && f.url !== '#' ? `<a target="_blank" rel="noopener" href="${f.url}" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow">Source</a>` : `<span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-kaa-ink/60">Source pending</span>`}
+        <div class="mt-4 flex items-center gap-2 flex-wrap">
+          ${srcBtns || '<span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-kaa-ink/60">Source pending</span>'}
           <button class="ml-auto inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-sm hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-kaa-glow" data-jump="${i}">View in Story</button>
         </div>`;
       gridEl.appendChild(card);
@@ -402,15 +421,10 @@
       const btn = e.target.closest('[data-jump]');
       if(!btn) return;
       const index = parseInt(btn.getAttribute('data-jump'), 10);
-      const targetX = window.innerWidth * index;
       const trackTop = document.getElementById('trackWrap').getBoundingClientRect().top + window.scrollY;
-      // Scroll to the start of the track, then nudge horizontal via ScrollToPlugin-like effect
-      window.scrollTo({ top: trackTop + 1, behavior: 'smooth' });
-      // Brief highlight
+      window.scrollTo({ top: trackTop + 1, behavior:'smooth' });
       const panel = document.querySelectorAll('.panel')[index];
-      if(panel){
-        panel.animate([{ filter: 'brightness(1.4)' }, { filter: 'brightness(1)' }], { duration: 900, easing: 'ease' });
-      }
+      if(panel){ panel.animate([{ filter:'brightness(1.4)' },{ filter:'brightness(1)' }], { duration:900, easing:'ease' }); }
     });
 
     // Memory wall (localStorage)
@@ -422,7 +436,7 @@
     function renderMemories(){
       const items = JSON.parse(localStorage.getItem(memKey) || '[]');
       list.innerHTML = '';
-      items.forEach((t, i)=>{
+      items.forEach((t)=>{
         const li = document.createElement('li');
         li.className = 'rounded-2xl border border-white/10 bg-white/[0.03] p-4';
         li.innerHTML = `<p class="whitespace-pre-wrap">${t}</p>`;
@@ -442,7 +456,6 @@
       renderMemories();
       fireConfetti();
     });
-
   </script>
 </body>
 </html>
